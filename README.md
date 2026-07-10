@@ -5,6 +5,8 @@ Plataforma para profesores de ajedrez: registra a tus alumnos con su usuario de
 último mes desde las APIs públicas para mostrar estadísticas accionables y un
 visor de partidas jugada a jugada.
 
+<img width="1302" height="677" alt="image" src="https://github.com/user-attachments/assets/17325dfe-3d66-4a02-abbf-a2e76e9a314e" />
+
 ## Problemática
 
 Para seguir el progreso de sus alumnos, el profesor de ajedrez hoy tiene que

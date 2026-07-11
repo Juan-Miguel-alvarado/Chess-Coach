@@ -3,12 +3,13 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   IconAlertCircle,
   IconArrowLeft,
+  IconBarbell,
   IconEdit,
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
-import type { CurrentRatings, GameSource, TimeClass } from "@/types";
+import type { CurrentRatings, GameSource, Tactics, TimeClass } from "@/types";
 import { studentRepository } from "@/lib/repositories";
 import { useStudentGames } from "@/lib/useStudentGames";
 import { deriveStats } from "@/lib/stats/deriveStats";
@@ -64,7 +65,7 @@ export function StudentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const student = id ? studentRepository.get(id) : null;
-  const { games, ratings, errors, loading, fetchedAt, refresh } =
+  const { games, ratings, tactics, errors, loading, fetchedAt, refresh } =
     useStudentGames(student);
   const [source, setSource] = useState<GameSource>("chesscom");
 
@@ -96,7 +97,7 @@ export function StudentDetail() {
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <p className="text-muted-foreground">Alumno no encontrado.</p>
         <Button asChild variant="outline">
-          <Link to="/dashboard">Volver al panel</Link>
+          <Link to="/students">Volver a Mis alumnos</Link>
         </Button>
       </div>
     );
@@ -107,7 +108,7 @@ export function StudentDetail() {
     if (confirm(`¿Eliminar a ${student.name}? Esta acción no se puede deshacer.`)) {
       studentRepository.remove(student.id);
       toast.success("Alumno eliminado");
-      navigate("/dashboard");
+      navigate("/students");
     }
   }
 
@@ -116,8 +117,8 @@ export function StudentDetail() {
   return (
     <div className="flex flex-col gap-6">
       <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit">
-        <Link to="/dashboard">
-          <IconArrowLeft size={16} /> Panel
+        <Link to="/students">
+          <IconArrowLeft size={16} /> Mis alumnos
         </Link>
       </Button>
 
@@ -148,6 +149,10 @@ export function StudentDetail() {
           </Button>
         </div>
       </div>
+
+      {student.chesscomUsername && (
+        <TacticsBox tactics={tactics} />
+      )}
 
       {student.notes && (
         <div className="rounded-lg border bg-muted/40 p-4 text-sm">
@@ -249,6 +254,64 @@ function SourceToggle({
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function TacticsBox({ tactics }: { tactics: Tactics | null }) {
+  const acc =
+    tactics && tactics.attempted > 0
+      ? Math.round((tactics.passed / tactics.attempted) * 100)
+      : null;
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border p-4">
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2 text-sm font-medium">
+          <IconBarbell size={18} className="text-muted-foreground" />
+          Táctica · Puzzles de Chess.com
+        </span>
+        <span className="text-xs text-muted-foreground">histórico</span>
+      </div>
+      {tactics ? (
+        <div className="flex flex-wrap gap-x-8 gap-y-2">
+          <TacticStat label="Resueltos" value={tactics.passed} tone="win" />
+          <TacticStat label="Fallados" value={tactics.failed} tone="loss" />
+          <TacticStat label="Intentados" value={tactics.attempted} />
+          <TacticStat label="Acierto" value={acc != null ? `${acc}%` : "—"} />
+          {tactics.rating != null && (
+            <TacticStat label="Rating táctica" value={tactics.rating} />
+          )}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Sin datos de táctica todavía — pulsa Sincronizar.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function TacticStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number | string;
+  tone?: "win" | "loss";
+}) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span
+        className={cn(
+          "text-lg font-semibold tabular-nums",
+          tone === "win" && "text-win",
+          tone === "loss" && "text-loss",
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }

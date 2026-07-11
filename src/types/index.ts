@@ -40,6 +40,15 @@ export interface Student {
   createdAt: number;
 }
 
+// Táctica/puzzles de Chess.com (histórico de la cuenta). Datos reales del
+// endpoint de estadísticas; `attempted`/`passed`/`failed` son acumulados.
+export interface Tactics {
+  rating: number | null;
+  attempted: number;
+  passed: number;
+  failed: number;
+}
+
 // Partida normalizada, independiente de la fuente.
 export interface Game {
   id: string;
@@ -66,6 +75,7 @@ export interface GameCache {
   fetchedAt: number;
   games: Game[];
   ratings?: CurrentRatings;
+  tactics?: Tactics;
   errors?: Partial<Record<GameSource, string>>;
 }
 

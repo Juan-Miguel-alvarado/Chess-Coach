@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Login } from "@/routes/Login";
 import { Register } from "@/routes/Register";
 import { Dashboard } from "@/routes/Dashboard";
+import { Compare } from "@/routes/Compare";
 import { StudentForm } from "@/routes/StudentForm";
 import { StudentDetail } from "@/routes/StudentDetail";
 import { GameViewer } from "@/routes/GameViewer";
@@ -19,7 +20,8 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppShell />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Compare />} />
+              <Route path="/students" element={<Dashboard />} />
               <Route path="/students/new" element={<StudentForm />} />
               <Route path="/students/:id" element={<StudentDetail />} />
               <Route path="/students/:id/edit" element={<StudentForm />} />

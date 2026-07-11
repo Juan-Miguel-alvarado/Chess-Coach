@@ -14,14 +14,18 @@ import { AlertBadges } from "@/components/AlertBadges";
 
 export function StudentCard({ student }: { student: Student }) {
   // Sólo caché: el dashboard no dispara descargas masivas.
-  const { games, fetchedAt } = useStudentGames(student, false);
+  const { games, tactics, fetchedAt } = useStudentGames(student, false);
   const stats = useMemo(() => deriveStats(games), [games]);
   const alerts = useMemo(() => deriveAlerts(games), [games]);
+  const accuracy =
+    tactics && tactics.attempted > 0
+      ? Math.round((tactics.passed / tactics.attempted) * 100)
+      : null;
 
   return (
-    <Link to={`/students/${student.id}`} className="group block">
-      <Card className="transition-colors group-hover:border-primary/40">
-        <CardContent className="flex flex-col gap-4">
+    <Link to={`/students/${student.id}`} className="group block h-full">
+      <Card className="h-full transition-colors group-hover:border-primary/40">
+        <CardContent className="flex h-full flex-col gap-4">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <h3 className="truncate font-semibold">{student.name}</h3>
@@ -65,11 +69,13 @@ export function StudentCard({ student }: { student: Student }) {
 
           {alerts.length > 0 && games.length > 0 && <AlertBadges alerts={alerts} />}
 
-          {fetchedAt && (
-            <p className="text-xs text-muted-foreground">
-              Actualizado {formatRelative(fetchedAt)} · {games.length} partidas
-            </p>
-          )}
+          <p className="mt-auto text-xs text-muted-foreground">
+            {fetchedAt
+              ? `Actualizado ${formatRelative(fetchedAt)} · ${games.length} partidas`
+              : "Sin sincronizar"}
+            {tactics ? ` · ${tactics.passed} puzzles` : ""}
+            {accuracy != null ? ` (${accuracy}% acierto)` : ""}
+          </p>
         </CardContent>
       </Card>
     </Link>

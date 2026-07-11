@@ -1,8 +1,15 @@
-import type { CurrentRatings, Game, GameSource, Student } from "@/types";
+import type {
+  CurrentRatings,
+  Game,
+  GameSource,
+  Student,
+  Tactics,
+} from "@/types";
 import {
   UserNotFoundError,
   fetchChesscomGames,
   fetchChesscomRatings,
+  fetchChesscomTactics,
 } from "./chesscom";
 import { fetchLichessGames, fetchLichessRatings } from "./lichess";
 
@@ -11,6 +18,7 @@ export const DEFAULT_WINDOW_DAYS = 30;
 export interface StudentGamesResult {
   games: Game[];
   ratings: CurrentRatings;
+  tactics?: Tactics;
   errors: Partial<Record<GameSource, string>>;
 }
 
@@ -34,6 +42,7 @@ export async function fetchStudentGames(
   const games: Game[] = [];
   const ratings: CurrentRatings = {};
   const errors: Partial<Record<GameSource, string>> = {};
+  const result: StudentGamesResult = { games, ratings, errors };
 
   const tasks: Promise<void>[] = [];
 
@@ -42,12 +51,14 @@ export async function fetchStudentGames(
     tasks.push(
       (async () => {
         try {
-          const [g, r] = await Promise.all([
+          const [g, r, tactics] = await Promise.all([
             fetchChesscomGames(username, student.id, sinceMs),
             fetchChesscomRatings(username).catch(() => ({})),
+            fetchChesscomTactics(username).catch(() => null),
           ]);
           games.push(...g);
           ratings.chesscom = r;
+          if (tactics) result.tactics = tactics;
         } catch (err) {
           errors.chesscom = messageFor("chesscom", err);
         }
@@ -76,5 +87,5 @@ export async function fetchStudentGames(
   await Promise.all(tasks);
   games.sort((a, b) => b.playedAt - a.playedAt);
 
-  return { games, ratings, errors };
+  return result;
 }

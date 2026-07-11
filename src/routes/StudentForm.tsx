@@ -50,7 +50,6 @@ export function StudentForm() {
       setError("Edad no válida.");
       return;
     }
-
     const payload = {
       teacherId: teacher.id,
       name: name.trim(),
@@ -61,9 +60,12 @@ export function StudentForm() {
     };
 
     if (isEdit && existing) {
+      const usersChanged =
+        (existing.chesscomUsername ?? "") !== (chesscom.trim() || "") ||
+        (existing.lichessUsername ?? "") !== (lichess.trim() || "");
       studentRepository.update(existing.id, payload);
-      // Los usuarios pueden haber cambiado: invalida la caché de partidas.
-      gameCacheRepository.clear(existing.id);
+      // Sólo invalida la caché de partidas si cambiaron los usuarios.
+      if (usersChanged) gameCacheRepository.clear(existing.id);
       toast.success("Alumno actualizado");
       navigate(`/students/${existing.id}`);
     } else {
@@ -76,7 +78,7 @@ export function StudentForm() {
   return (
     <div className="mx-auto max-w-xl">
       <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
-        <Link to={isEdit && existing ? `/students/${existing.id}` : "/dashboard"}>
+        <Link to={isEdit && existing ? `/students/${existing.id}` : "/students"}>
           <IconArrowLeft size={16} /> Volver
         </Link>
       </Button>

@@ -2,11 +2,16 @@ import type {
   CurrentRatings,
   Game,
   GameResult,
+  Tactics,
   Termination,
   TimeClass,
 } from "@/types";
 
 const BASE = "https://api.chess.com/pub";
+
+// Endpoint interno de Chess.com (con conteos de táctica) vía el proxy de Vite,
+// porque no tiene CORS. Ver vite.config.ts.
+const CALLBACK = "/cc-callback";
 
 // Errores de dominio distinguibles por la UI.
 export class UserNotFoundError extends Error {}
@@ -161,6 +166,33 @@ export async function fetchChesscomGames(
   }
 
   return games;
+}
+
+// Táctica/puzzles del usuario (histórico): intentados, acertados, fallados y
+// rating. Datos reales del endpoint interno de Chess.com. Devuelve null si no
+// hay datos o el proxy no está disponible (p. ej. build estático).
+export async function fetchChesscomTactics(
+  username: string,
+): Promise<Tactics | null> {
+  try {
+    const res = await fetch(
+      `${CALLBACK}/member/stats/${encodeURIComponent(username.trim().toLowerCase())}`,
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      stats?: { key: string; stats: Record<string, number> }[];
+    };
+    const t = data.stats?.find((s) => s.key === "tactics")?.stats;
+    if (!t) return null;
+    return {
+      rating: t.rating ?? t.highest_rating ?? null,
+      attempted: t.attempt_count ?? 0,
+      passed: t.passed_count ?? 0,
+      failed: t.failed_count ?? 0,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchChesscomRatings(

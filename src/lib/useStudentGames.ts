@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CurrentRatings, Game, GameSource, Student } from "@/types";
+import type {
+  CurrentRatings,
+  Game,
+  GameSource,
+  Student,
+  Tactics,
+} from "@/types";
 import { gameCacheRepository } from "@/lib/repositories";
 import { fetchStudentGames } from "@/lib/api/fetchStudentGames";
 
@@ -9,6 +15,7 @@ const AUTO_SYNC_MS = 3 * 60 * 1000; // sincronización automática cada 3 minuto
 export interface UseStudentGames {
   games: Game[];
   ratings: CurrentRatings;
+  tactics: Tactics | null;
   errors: Partial<Record<GameSource, string>>;
   loading: boolean;
   fetchedAt: number | null;
@@ -23,6 +30,7 @@ export function useStudentGames(
 ): UseStudentGames {
   const [games, setGames] = useState<Game[]>([]);
   const [ratings, setRatings] = useState<CurrentRatings>({});
+  const [tactics, setTactics] = useState<Tactics | null>(null);
   const [errors, setErrors] = useState<Partial<Record<GameSource, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
@@ -36,6 +44,7 @@ export function useStudentGames(
       const result = await fetchStudentGames(student);
       setGames(result.games);
       setRatings(result.ratings);
+      setTactics(result.tactics ?? null);
       setErrors(result.errors);
       const now = Date.now();
       setFetchedAt(now);
@@ -44,6 +53,7 @@ export function useStudentGames(
         fetchedAt: now,
         games: result.games,
         ratings: result.ratings,
+        tactics: result.tactics,
         errors: result.errors,
       });
     } finally {
@@ -58,11 +68,13 @@ export function useStudentGames(
     if (cached) {
       setGames(cached.games);
       setRatings(cached.ratings ?? {});
+      setTactics(cached.tactics ?? null);
       setErrors(cached.errors ?? {});
       setFetchedAt(cached.fetchedAt);
     } else {
       setGames([]);
       setRatings({});
+      setTactics(null);
       setErrors({});
       setFetchedAt(null);
     }
@@ -85,5 +97,5 @@ export function useStudentGames(
     return () => clearInterval(interval);
   }, [auto, student?.id]);
 
-  return { games, ratings, errors, loading, fetchedAt, refresh };
+  return { games, ratings, tactics, errors, loading, fetchedAt, refresh };
 }

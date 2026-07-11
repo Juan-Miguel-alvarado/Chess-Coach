@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  IconArrowLeft,
   IconPlus,
   IconRefresh,
   IconSearch,
@@ -64,6 +65,12 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit">
+        <Link to="/dashboard">
+          <IconArrowLeft size={16} /> Ranking
+        </Link>
+      </Button>
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Mis alumnos</h1>

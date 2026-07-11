@@ -6,12 +6,14 @@ import {
   IconRefresh,
   IconSearch,
   IconUsers,
+  IconUsersPlus,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import type { Student } from "@/types";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { studentRepository, gameCacheRepository } from "@/lib/repositories";
 import { fetchStudentGames } from "@/lib/api/fetchStudentGames";
+import { addDemoStudents } from "@/lib/demoStudents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -63,6 +65,18 @@ export function Dashboard() {
     }
   }
 
+  // Solo para testear: agrega 20 alumnos con cuentas reales.
+  function addDemo() {
+    if (!teacher) return;
+    const n = addDemoStudents(teacher.id);
+    setSyncKey((k) => k + 1);
+    toast.success(
+      n > 0
+        ? `${n} alumnos de prueba agregados`
+        : "Los alumnos de prueba ya estaban agregados",
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit">
@@ -78,7 +92,10 @@ export function Dashboard() {
             {students.length} alumno{students.length === 1 ? "" : "s"} · partidas del último mes
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={addDemo}>
+            <IconUsersPlus size={16} /> Agregar 20 alumnos (test)
+          </Button>
           {students.length > 0 && (
             <Button variant="outline" onClick={syncAll} disabled={syncing}>
               <IconRefresh
@@ -112,7 +129,7 @@ export function Dashboard() {
       )}
 
       {students.length === 0 ? (
-        <EmptyState />
+        <EmptyState onAddDemo={addDemo} />
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Ningún alumno coincide con «{query}».
@@ -128,7 +145,7 @@ export function Dashboard() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ onAddDemo }: { onAddDemo: () => void }) {
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
@@ -142,11 +159,16 @@ function EmptyState() {
             empezar a ver sus estadísticas.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/students/new">
-            <IconPlus size={16} /> Agregar alumno
-          </Link>
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button asChild>
+            <Link to="/students/new">
+              <IconPlus size={16} /> Agregar alumno
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={onAddDemo}>
+            <IconUsersPlus size={16} /> Agregar 20 alumnos (test)
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

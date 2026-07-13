@@ -1,70 +1,72 @@
 # ChessCoach
 
-Plataforma para profesores de ajedrez: registra a tus alumnos con su usuario de
-**Chess.com** y **Lichess**, y la app descarga automáticamente sus partidas del
-último mes desde las APIs públicas para mostrar estadísticas accionables y un
-visor de partidas jugada a jugada.
+A platform for chess teachers: register your students with their **Chess.com**
+and **Lichess** usernames, and the app automatically downloads their games from
+the last month via the public APIs to show actionable statistics and a
+move-by-move game viewer.
 
 <img width="1302" height="677" alt="image" src="https://github.com/user-attachments/assets/17325dfe-3d66-4a02-abbf-a2e76e9a314e" />
 
-## Problemática
+## Problem
 
-Para seguir el progreso de sus alumnos, el profesor de ajedrez hoy tiene que
-**abrir muchas páginas y revisar muchos perfiles en sitios distintos**: entrar a
-Chess.com de cada alumno, luego a su Lichess, buscar sus partidas, mirar
-estadísticas por separado, comparar a mano cómo van con blancas y negras, en qué
-ritmos, cómo ganan o pierden… Es un proceso lento, disperso y difícil de repetir
-para cada estudiante.
+To keep track of their students' progress, a chess teacher today has to **open
+many pages and review many profiles across different sites**: go to each
+student's Chess.com, then their Lichess, look up their games, review statistics
+separately, manually compare how they do with white and black, at which time
+controls, how they win or lose… It's a slow, scattered process that's hard to
+repeat for every student.
 
-## Solución
+## Solution
 
-**ChessCoach reúne todo en una sola aplicación.** El profesor da de alta al
-alumno una vez (con su usuario de Chess.com y/o Lichess) y la plataforma:
+**ChessCoach brings everything together in a single application.** The teacher
+registers the student once (with their Chess.com and/or Lichess username) and the
+platform:
 
-- Descarga automáticamente sus partidas del último mes de **ambas plataformas**.
-- Las unifica y calcula las **estadísticas** en un solo lugar: rendimiento con
-  blancas y negras, por ritmo, formas de ganar y perder, aperturas y progresión
-  de rating.
-- Muestra un **dashboard** con todos los alumnos y alertas para saber a quién
-  revisar primero.
-- Permite **reproducir cada partida** jugada a jugada sin salir de la app.
+- Automatically downloads their games from the last month on **both platforms**.
+- Unifies them and computes the **statistics** in one place: performance with
+  white and black, by time control, ways of winning and losing, openings and
+  rating progression.
+- Shows a **dashboard** with all students and alerts so you know who to review
+  first.
+- Lets you **replay each game** move by move without leaving the app.
 
-Así, en lugar de abrir decenas de pestañas en varios sitios, el profesor tiene
-**el panorama completo de cada alumno en una sola página**.
+So instead of opening dozens of tabs across several sites, the teacher has **the
+complete picture of each student on a single page**.
 
-## Funcionalidades
+## Features
 
-- **Auth de profesor** (registro / login) — Fase 1 en `localStorage`.
-- **Alumnos**: alta/edición con nombre, edad, usuario Chess.com, usuario Lichess y notas.
-- **Dashboard**: tarjeta por alumno con balance V-T-D, forma reciente y alertas
-  (racha de derrotas, caída de rating, inactividad). Búsqueda y "Sincronizar todos".
-- **Perfil del alumno**:
-  - Ratings actuales por ritmo (ambas fuentes).
-  - KPIs, progresión de rating, rendimiento por color, por ritmo.
-  - Cómo gana / cómo pierde (por forma de término) y aperturas más jugadas.
-  - Lista de partidas con filtros (color / resultado / ritmo).
-- **Visor de partidas**: tablero navegable jugada a jugada (teclas ← →), lista de
-  jugadas, copiar/descargar PGN y enlace a la partida original.
-- Tema claro/oscuro.
+- **Teacher auth** (sign up / log in) — Phase 1 in `localStorage`.
+- **Students**: create/edit with name, age, Chess.com username, Lichess username and notes.
+- **Dashboard**: a card per student with W-D-L balance, recent form and alerts
+  (losing streak, rating drop, inactivity). Search and "Sync all".
+- **Student profile**:
+  - Current ratings by time control (both sources).
+  - KPIs, rating progression, performance by color, by time control.
+  - How they win / how they lose (by termination type) and most played openings.
+  - Game list with filters (color / result / time control).
+- **Game viewer**: navigable board move by move (← → keys), move list,
+  copy/download PGN and a link to the original game.
+- Light/dark theme.
 
 ## Stack
 
-Vite · React · TypeScript · Tailwind v4 · shadcn/ui · Tabler Icons · fuente Onest ·
+Vite · React · TypeScript · Tailwind v4 · shadcn/ui · Tabler Icons · Onest font ·
 Recharts · chess.js · react-chessboard · react-router.
 
-## Arquitectura
+## Architecture
 
-El acceso a datos vive detrás de interfaces en [`src/lib/repositories`](src/lib/repositories/)
-(`AuthRepository`, `StudentRepository`, `GameCacheRepository`). Hoy la
-implementación es `localStorage`; **para migrar a Supabase basta con añadir una
-implementación con la misma forma y cambiar las asignaciones en
-[`src/lib/repositories/index.ts`](src/lib/repositories/index.ts)** — la UI no cambia.
+Data access lives behind interfaces in [`src/lib/repositories`](src/lib/repositories/)
+(`AuthRepository`, `StudentRepository`, `GameCacheRepository`). Today the
+implementation is `localStorage`; **to migrate to Supabase you just add an
+implementation with the same shape and change the assignments in
+[`src/lib/repositories/index.ts`](src/lib/repositories/index.ts)** — the UI
+doesn't change.
 
-Las partidas de Chess.com y Lichess se normalizan a un tipo `Game` único en
-[`src/lib/api`](src/lib/api/), y las estadísticas se derivan en
+Chess.com and Lichess games are normalized to a single `Game` type in
+[`src/lib/api`](src/lib/api/), and the statistics are derived in
 [`src/lib/stats/deriveStats.ts`](src/lib/stats/deriveStats.ts).
 
-## Desarrollo
+## Development
 
 ```bash
 npm install
@@ -72,5 +74,5 @@ npm run dev      # http://localhost:5173
 npm run build    # tsc -b + vite build
 ```
 
-Crea una cuenta, agrega un alumno con un usuario real (p. ej. Chess.com
-`magnuscarlsen`) y pulsa Sincronizar.
+Create an account, add a student with a real username (e.g. Chess.com
+`magnuscarlsen`) and click Sync.

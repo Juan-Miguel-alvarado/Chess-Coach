@@ -124,8 +124,8 @@ export function GameViewer() {
                 boardOrientation: game.color,
                 allowDragging: false,
                 id: "viewer",
-                darkSquareStyle: { backgroundColor: "#7b8aa0" },
-                lightSquareStyle: { backgroundColor: "#dfe4ea" },
+                darkSquareStyle: { backgroundColor: "#8d7345" },
+                lightSquareStyle: { backgroundColor: "#ece1d4" },
               }}
             />
           </div>

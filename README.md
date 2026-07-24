@@ -5,7 +5,8 @@ and **Lichess** usernames, and the app automatically downloads their games from
 the last month via the public APIs to show actionable statistics and a
 move-by-move game viewer.
 
-<img width="1302" height="677" alt="image" src="https://github.com/user-attachments/assets/17325dfe-3d66-4a02-abbf-a2e76e9a314e" />
+<img width="1305" height="675" alt="screenshot-2026-07-24_08-53-04" src="https://github.com/user-attachments/assets/fc968fd2-c9f0-4a2a-9148-7e9fb8073915" />
+
 
 ## Problem
 
